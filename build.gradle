@@ -1,0 +1,39 @@
+buildscript {
+    ext {
+        springfoxVersion = '2.9.2'
+        lombokVersion = '1.18.6'
+        mockitoVersion = '3.3.3'
+    }
+}
+
+plugins {
+    id 'java'
+    id 'maven'
+    id 'org.springframework.boot' version '2.2.6.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+}
+
+group 'cz.rohlik.warehouse'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation "org.projectlombok:lombok:${lombokVersion}"
+    implementation "io.springfox:springfox-swagger2:${springfoxVersion}"
+    implementation "io.springfox:springfox-swagger-ui:${springfoxVersion}"
+
+    runtime "com.h2database:h2"
+
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+
+    testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
