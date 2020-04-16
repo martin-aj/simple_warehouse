@@ -30,7 +30,7 @@ public class OrderController {
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
     @ApiOperation(value = "Creates a new order.")
-    public void createProduct(@RequestBody @Valid OrderDto order) {
+    public void createProduct(@RequestBody @Valid OrderDto order) throws Exception{
         orderService.createOrder(order);
     }
 

@@ -8,6 +8,7 @@ import lombok.*;
 @Setter
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 @Entity
 @Table
@@ -28,9 +29,9 @@ public class Product {
 
     private String description;
 
-    public Product(String name, BigDecimal unitPrice, String description) {
-        this.name = name;
-        this.unitPrice = unitPrice;
-        this.description = description;
-    }
+//    public Product(String name, BigDecimal unitPrice, String description) {
+//        this.name = name;
+//        this.unitPrice = unitPrice;
+//        this.description = description;
+//    }
 }

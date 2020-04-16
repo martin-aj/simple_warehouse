@@ -4,7 +4,7 @@ import cz.rohlik.warehouse.model.OrderDto;
 
 public interface OrderService {
 
-    void createOrder(OrderDto order);
+    void createOrder(OrderDto order) throws Exception;
 
     void invalidateOrder(long orderId);
 
