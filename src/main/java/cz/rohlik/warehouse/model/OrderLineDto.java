@@ -12,5 +12,4 @@ public class OrderLineDto {
     @ApiModelProperty(value = "Number of ordered units", required = true)
     private Long quantity;
 
-
 }

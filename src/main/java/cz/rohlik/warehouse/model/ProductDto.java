@@ -7,12 +7,15 @@ import lombok.Data;
 @Data
 public class ProductDto {
 
-    @ApiModelProperty(value = "Identification of product", required = true)
+    @ApiModelProperty("Identification of product for updates")
     Long id;
 
     @ApiModelProperty(value = "Name of product", required = true)
-    String name;
+    private String name;
 
     @ApiModelProperty(value = "Unit price", required = true)
-    BigDecimal unitPrice;
+    private BigDecimal unitPrice;
+
+    @ApiModelProperty("Description of product")
+    private String description;
 }

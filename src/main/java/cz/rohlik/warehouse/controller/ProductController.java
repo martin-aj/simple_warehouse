@@ -1,6 +1,6 @@
 package cz.rohlik.warehouse.controller;
 
-import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import cz.rohlik.warehouse.config.SwaggerConfig;
@@ -9,10 +9,9 @@ import cz.rohlik.warehouse.service.ProductService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -29,8 +28,39 @@ public class ProductController {
     @PostMapping(value = "/products", consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
     @ApiOperation(value = "Creates a new product.")
-    public void createUser(@Valid ProductDto product) {
+    public void createProduct(@RequestBody @Valid ProductDto product) {
         productService.createProduct(product);
+    }
+
+    /**
+     * A deletion endpoint for existing {@link cz.rohlik.warehouse.domain.Product} entity.
+     *
+     * @param productId identifier of deleted product
+     */
+    @DeleteMapping(value = "/products/{productId}")
+    @ResponseStatus(NO_CONTENT)
+    @ApiOperation(value = "Creates a new product.")
+    public void deleteProduct(@PathVariable @NonNull Long productId) {
+        productService.deleteProduct(productId);
+    }
+
+    /**
+     * An update endpoint for existing {@link cz.rohlik.warehouse.domain.Product} entity.
+     *
+     * @param product describe product
+     */
+    @PutMapping(value = "/products", consumes = APPLICATION_JSON_VALUE)
+    @ResponseStatus(NO_CONTENT)
+    @ApiOperation(value = "Update an existing product.")
+    public void updateProduct(@RequestBody @Valid ProductDto product) {
+        productService.updateProduct(product);
+    }
+
+    @GetMapping(value = "/products")
+    @ResponseStatus(OK)
+    @ApiOperation(value = "Temporary getting endpoint.")
+    public void getProducts() {
+        productService.getProducts();
     }
 
 }
