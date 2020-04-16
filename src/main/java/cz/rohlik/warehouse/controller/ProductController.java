@@ -8,6 +8,7 @@ import cz.rohlik.warehouse.model.ProductDto;
 import cz.rohlik.warehouse.service.ProductService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import java.util.List;
 import javax.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RestController
 @Api(value = "/products", tags = {SwaggerConfig.TAG_PRODUCTS})
+@RequestMapping("/products")
 public class ProductController {
 
     private final ProductService productService;
@@ -25,7 +27,7 @@ public class ProductController {
      *
      * @param product describe product
      */
-    @PostMapping(value = "/products", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
     @ApiOperation(value = "Creates a new product.")
     public void createProduct(@RequestBody @Valid ProductDto product) {
@@ -37,7 +39,7 @@ public class ProductController {
      *
      * @param productId identifier of deleted product
      */
-    @DeleteMapping(value = "/products/{productId}")
+    @DeleteMapping(value = "/{productId}")
     @ResponseStatus(NO_CONTENT)
     @ApiOperation(value = "Creates a new product.")
     public void deleteProduct(@PathVariable @NonNull Long productId) {
@@ -49,18 +51,17 @@ public class ProductController {
      *
      * @param product describe product
      */
-    @PutMapping(value = "/products", consumes = APPLICATION_JSON_VALUE)
+    @PatchMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(NO_CONTENT)
     @ApiOperation(value = "Update an existing product.")
     public void updateProduct(@RequestBody @Valid ProductDto product) {
         productService.updateProduct(product);
     }
 
-    @GetMapping(value = "/products")
+    @GetMapping
     @ResponseStatus(OK)
     @ApiOperation(value = "Temporary getting endpoint.")
-    public void getProducts() {
-        productService.getProducts();
+    public List<ProductDto> getProducts() {
+        return productService.getProducts();
     }
-
 }

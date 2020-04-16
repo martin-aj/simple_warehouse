@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RestController
 @Api(value = "/orders", tags = {SwaggerConfig.TAG_ORDERS})
+@RequestMapping("/orders")
 public class OrderController {
 
     private final OrderService orderService;
@@ -26,7 +27,7 @@ public class OrderController {
      *
      * @param order describe order - product id and quantity
      */
-    @PostMapping(value = "/orders", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(CREATED)
     @ApiOperation(value = "Creates a new order.")
     public void createProduct(@RequestBody @Valid OrderDto order) {
@@ -38,7 +39,7 @@ public class OrderController {
      *
      * @param orderId identifier of deleted order
      */
-    @DeleteMapping(value = "/orders/{productId}")
+    @DeleteMapping(value = "/{productId}")
     @ResponseStatus(NO_CONTENT)
     @ApiOperation(value = "Invalidate order.")
     public void deleteOrder(@PathVariable @NonNull Long orderId) {
@@ -50,7 +51,7 @@ public class OrderController {
      *
      * @param orderId identification of placed order
      */
-    @PutMapping(value = "/orders/{orderId}", consumes = APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{orderId}", consumes = APPLICATION_JSON_VALUE)
     @ResponseStatus(NO_CONTENT)
     @ApiOperation(value = "Update status of existing order.")
     public void paymentOrder(@PathVariable @NonNull Long orderId) {
