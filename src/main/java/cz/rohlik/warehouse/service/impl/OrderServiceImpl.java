@@ -6,13 +6,16 @@ import cz.rohlik.warehouse.domain.Product;
 import cz.rohlik.warehouse.model.OrderDto;
 import cz.rohlik.warehouse.model.OrderLineDto;
 import cz.rohlik.warehouse.model.OrderState;
+import cz.rohlik.warehouse.repository.OrderLineRepository;
 import cz.rohlik.warehouse.repository.OrderRepository;
 import cz.rohlik.warehouse.repository.ProductRepository;
 import cz.rohlik.warehouse.service.OrderService;
 import cz.rohlik.warehouse.service.mappings.OrderMapper;
+import cz.rohlik.warehouse.service.mappings.ProductMapper;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
@@ -27,6 +30,7 @@ import org.springframework.stereotype.Service;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
+    private final OrderLineRepository orderLineRepository;
     private final ProductRepository productRepository;
 
     @Value("${warehouse.order.expiration:30}")
@@ -36,30 +40,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void createOrder(OrderDto orderDto) throws Exception {
-//        List<OrderLine> orderLines = Mappers.getMapper(OrderMapper.class).toDomainList(orderDto.getOrderLineDtos());
-//        List<OrderLineDto> orderLinesDto = orderDto.getOrderLineDtos()
-//        List<OrderLineDto> missingOrderLineDto = new ArrayList<>();
-//        for (OrderLineDto orderLine : orderLines) {
-//            Product product = productRepository.findById(orderLine.getPro)
-//            if (orderLine.getQuantity() - order)
-//            missingOrderLineDto.add()
-//        }
-//        if (missingOrderLineDto.size() > 0) {
-//            throw new Exception(missingOrderLineDto.toString());
-//        }
-    }
-
-    @Override
-    @Transactional
     public void invalidateOrder(long orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
         order.setState(OrderState.INVALIDATE);
         List<OrderLine> orderLines = order.getOrderLines();
         for (OrderLine orderLine : orderLines) {
             Product product = orderLine.getProduct();
-            Long quantity = product.getQuantity() + orderLine.getQuantity();
-            product.setQuantity(quantity);
+            product.setQuantity(product.getQuantity() + orderLine.getQuantity());
             productRepository.save(product);
         }
         orderRepository.save(order);
@@ -70,6 +57,48 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
         order.setState(OrderState.PAID);
         orderRepository.save(order);
+    }
+
+    @Override
+    public List<OrderDto> getOrders() {
+        return Mappers.getMapper(OrderMapper.class).fromDomainList(orderRepository.findAll());
+    }
+
+    @Override
+    @Transactional
+    public void createOrder(OrderDto orderDto) throws Exception {
+        List<OrderLineDto> orderLinesDto = orderDto.getOrderLineDtos();
+        List<OrderLineDto> missingOrderLinesDto = new ArrayList<>();
+        Order order = new Order();
+        List<OrderLine> orderLines = new ArrayList<>();
+        for(OrderLineDto orderLineDto : orderLinesDto) {
+            final Long productId = orderLineDto.getProductId();
+            final Long quantity = orderLineDto.getQuantity();
+            Optional<Product> productOptional = productRepository.findById(productId);
+            if (productOptional.isPresent()) {
+                Product product = productOptional.get();
+                long quantityDecreased = product.getQuantity() - quantity;
+                if (quantityDecreased < 0) {
+                    missingOrderLinesDto.add(new OrderLineDto(productId, product.getName(), Math.abs(quantityDecreased)));
+                } else {
+                    OrderLine orderLine = new OrderLine();
+                    orderLine.setQuantity(quantity);
+                    orderLine.setOrder(order);
+                    orderLine.setProduct(product);
+                    orderLines.add(orderLine);
+                    product.setQuantity(quantityDecreased);
+                    productRepository.save(product);
+                }
+            } else {
+                missingOrderLinesDto.add(new OrderLineDto(productId, orderLineDto.getName(), quantity));
+            }
+        }
+        if (!missingOrderLinesDto.isEmpty()) {
+            throw new Exception(missingOrderLinesDto.toString());
+        }
+
+        orderRepository.save(order);
+        orderLineRepository.saveAll(orderLines);
     }
 
     /*

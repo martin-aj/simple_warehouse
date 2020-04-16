@@ -1,6 +1,7 @@
 package cz.rohlik.warehouse.domain;
 
 import cz.rohlik.warehouse.model.OrderState;
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 import javax.persistence.*;
@@ -35,4 +36,6 @@ public class Order {
     private ZonedDateTime created = ZonedDateTime.now();
 
     private OrderState state = OrderState.ACTIVE;
+
+    private BigDecimal price;
 }
