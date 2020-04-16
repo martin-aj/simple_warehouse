@@ -4,10 +4,7 @@ import cz.rohlik.warehouse.model.OrderState;
 import java.time.ZonedDateTime;
 import java.util.List;
 import javax.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * The Order identifies an entity for basket of products with quantity and summary price.
@@ -15,6 +12,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
 @EqualsAndHashCode(of = "id")
 @Entity
 @Table(name = "\"Order\"")
@@ -33,7 +31,7 @@ public class Order {
     /**
      * Timestamp when entity was created.
      */
-    @Column(name = "INSERT_DT", nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false)
     private ZonedDateTime created = ZonedDateTime.now();
 
     private OrderState state = OrderState.ACTIVE;

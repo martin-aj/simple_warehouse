@@ -16,6 +16,9 @@ public class ProductDto {
     @ApiModelProperty(value = "Unit price", required = true)
     private BigDecimal unitPrice;
 
+    @ApiModelProperty(value = "Quantity in the storage", required = true)
+    private Long quantity;
+
     @ApiModelProperty("Description of product")
     private String description;
 }

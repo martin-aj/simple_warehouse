@@ -23,6 +23,9 @@ public class Product {
     @Column(nullable = false)
     private BigDecimal unitPrice;
 
+    @Column(nullable = false)
+    private Long quantity;
+
     private String description;
 
     public Product(String name, BigDecimal unitPrice, String description) {

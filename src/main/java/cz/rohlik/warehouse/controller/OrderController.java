@@ -39,10 +39,10 @@ public class OrderController {
      *
      * @param orderId identifier of deleted order
      */
-    @DeleteMapping(value = "/{productId}")
+    @PutMapping(value = "inactivate/{orderId}")
     @ResponseStatus(NO_CONTENT)
     @ApiOperation(value = "Invalidate order.")
-    public void deleteOrder(@PathVariable @NonNull Long orderId) {
+    public void inactivateOrder(@PathVariable @NonNull Long orderId) {
         orderService.invalidateOrder(orderId);
     }
 
@@ -51,7 +51,7 @@ public class OrderController {
      *
      * @param orderId identification of placed order
      */
-    @PutMapping(value = "/{orderId}", consumes = APPLICATION_JSON_VALUE)
+    @PutMapping(value = "payment/{orderId}")
     @ResponseStatus(NO_CONTENT)
     @ApiOperation(value = "Update status of existing order.")
     public void paymentOrder(@PathVariable @NonNull Long orderId) {
