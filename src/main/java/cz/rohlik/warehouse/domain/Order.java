@@ -12,7 +12,6 @@ import lombok.*;
  */
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
 @Entity

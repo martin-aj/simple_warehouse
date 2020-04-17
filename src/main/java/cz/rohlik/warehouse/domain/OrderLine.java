@@ -1,14 +1,12 @@
 package cz.rohlik.warehouse.domain;
 
 import javax.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
 @EqualsAndHashCode(of = "id")
 @Entity
 @Table
@@ -18,8 +16,6 @@ public class OrderLine {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    private Long productId;
-
     private Long quantity;
 
     @ManyToOne
@@ -27,4 +23,10 @@ public class OrderLine {
 
     @ManyToOne
     private Product product;
+
+    public OrderLine(Long quantity, Order order, Product product) {
+        this.quantity = quantity;
+        this.order = order;
+        this.product = product;
+    }
 }

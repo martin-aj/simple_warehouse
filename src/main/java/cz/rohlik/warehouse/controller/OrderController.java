@@ -5,7 +5,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import cz.rohlik.warehouse.config.SwaggerConfig;
 import cz.rohlik.warehouse.model.OrderDto;
-import cz.rohlik.warehouse.model.ProductDto;
 import cz.rohlik.warehouse.service.OrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
