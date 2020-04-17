@@ -40,11 +40,13 @@ public class OrderServiceImpl implements OrderService {
     private static final long CHECK_ORDER = 60000; // in millis
     private static final String ILLEGAL_STATE_ERR_MSG = "Given order is not active. Current state is: %s";
     private static final String STOCKPILE_ERR_MSG = "Missing products: %s";
+    private static final String ENTITY_NOT_FOUND_ERR_MSG = "Unable to find an order with the '%s' id!";
 
     @Override
     @Transactional
     public void invalidateOrder(long orderId) {
-        Order order = orderRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(ENTITY_NOT_FOUND_ERR_MSG, orderId)));
         if (OrderState.ACTIVE != order.getState()) {
             throw new IllegalStateException(String.format(ILLEGAL_STATE_ERR_MSG, order.getState()));
         }
@@ -60,7 +62,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void paymentOrder(long orderId) {
-        Order order = orderRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(ENTITY_NOT_FOUND_ERR_MSG, orderId)));
         if (OrderState.ACTIVE.equals(order.getState())) {
             order.setState(OrderState.PAID);
             orderRepository.save(order);
@@ -109,13 +112,15 @@ public class OrderServiceImpl implements OrderService {
      * This method is scheduled every minute
      */
     @Scheduled(fixedDelay = CHECK_ORDER)
+    @Transactional
     protected void invalidateActiveOrders() {
-        List<Order> expiredOrders = orderRepository.findAll().stream()
+        List<Long> expiredOrderIds = orderRepository.findAll().stream()
                 .filter(order -> OrderState.ACTIVE.equals(order.getState()))
                 .filter(order -> order.getCreated().plusMinutes(orderExpiration).isBefore(ZonedDateTime.now()))
+                .map(Order::getId)
                 .collect(Collectors.toList());
-        for (Order order : expiredOrders) {
-            invalidateOrder(order.getId());
+        for (long expiredOrderId : expiredOrderIds) {
+            invalidateOrder(expiredOrderId);
         }
     }
 

@@ -41,7 +41,7 @@ public class ProductController {
      */
     @DeleteMapping(value = "/{productId}")
     @ResponseStatus(NO_CONTENT)
-    @ApiOperation(value = "Creates a new product.")
+    @ApiOperation(value = "Delete existing product. It doesn't affect active orders")
     public void deleteProduct(@PathVariable @NonNull Long productId) {
         productService.deleteProduct(productId);
     }
