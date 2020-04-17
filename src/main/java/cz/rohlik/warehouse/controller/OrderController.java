@@ -60,7 +60,7 @@ public class OrderController {
 
     @GetMapping
     @ResponseStatus(OK)
-    @ApiOperation(value = "Temporary getting endpoint.")
+    @ApiOperation(value = "List of all orders.")
     public List<OrderDto> getOrders() {
         return orderService.getOrders();
     }

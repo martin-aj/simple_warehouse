@@ -3,6 +3,7 @@ package cz.rohlik.warehouse.service.impl;
 import cz.rohlik.warehouse.domain.Order;
 import cz.rohlik.warehouse.domain.OrderLine;
 import cz.rohlik.warehouse.domain.Product;
+import cz.rohlik.warehouse.exception.StockpileException;
 import cz.rohlik.warehouse.model.OrderDto;
 import cz.rohlik.warehouse.model.OrderLineDto;
 import cz.rohlik.warehouse.model.OrderState;
@@ -21,11 +22,9 @@ import javax.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
 
 @RequiredArgsConstructor
 @Service
@@ -39,12 +38,16 @@ public class OrderServiceImpl implements OrderService {
     private long orderExpiration;
 
     private static final long CHECK_ORDER = 60000; // in millis
-//    private static final String STOCKPILE_ERR_MSG = "Product are not available in this amount";
+    private static final String ILLEGAL_STATE_ERR_MSG = "Given order is not active. Current state is: %s";
+    private static final String STOCKPILE_ERR_MSG = "Missing products: %s";
 
     @Override
     @Transactional
     public void invalidateOrder(long orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
+        if (OrderState.ACTIVE != order.getState()) {
+            throw new IllegalStateException(String.format(ILLEGAL_STATE_ERR_MSG, order.getState()));
+        }
         order.setState(OrderState.INVALIDATE);
         List<OrderLine> orderLines = order.getOrderLines();
         for (OrderLine orderLine : orderLines) {
@@ -58,9 +61,12 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void paymentOrder(long orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
-
-        order.setState(OrderState.PAID);
-        orderRepository.save(order);
+        if (OrderState.ACTIVE.equals(order.getState())) {
+            order.setState(OrderState.PAID);
+            orderRepository.save(order);
+        } else {
+            throw new IllegalStateException(String.format(ILLEGAL_STATE_ERR_MSG, order.getState()));
+        }
     }
 
     @Override
@@ -134,7 +140,7 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         if (!missingOrderLinesDto.isEmpty()) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, missingOrderLinesDto.toString());
+            throw new StockpileException(String.format(STOCKPILE_ERR_MSG, missingOrderLinesDto.toString()));
         }
     }
 }

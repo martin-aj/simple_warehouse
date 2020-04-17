@@ -13,7 +13,7 @@ public interface ProductService {
     void createProduct(ProductDto product);
 
     /**
-     * Makes an update for existing product. Only non-null properties are changed.
+     * Makes a deletion of existing product.
      *
      * @param productId   identifier of product to be deleted
      */

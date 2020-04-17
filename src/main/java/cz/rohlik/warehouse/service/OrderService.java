@@ -5,10 +5,28 @@ import java.util.List;
 
 public interface OrderService {
 
-    void createOrder(OrderDto order) throws Exception;
+    /**
+     * Creates a new {@link cz.rohlik.warehouse.domain.Order} entity.
+     *
+     * @param order   order object for creation
+     */
+    void createOrder(OrderDto order);
 
+    /**
+     * Makes an update of state for existing order.
+     * Change of state - Active => Invalidate.
+     * Return products quantity to stockpile
+     *
+     * @param orderId   identifier of product to be invalidated
+     */
     void invalidateOrder(long orderId);
 
+    /**
+     * Makes an update of state for existing order.
+     * Change of state - Active => Paid.
+     *
+     * @param orderId   identifier of product to be paid
+     */
     void paymentOrder(long orderId);
 
     /**

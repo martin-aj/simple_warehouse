@@ -60,7 +60,7 @@ public class ProductController {
 
     @GetMapping
     @ResponseStatus(OK)
-    @ApiOperation(value = "Temporary getting endpoint.")
+    @ApiOperation(value = "List of all products.")
     public List<ProductDto> getProducts() {
         return productService.getProducts();
     }
